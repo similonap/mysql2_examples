@@ -144,4 +144,3 @@ const [result_delete] = await connection.execute<OkPacket>('DELETE FROM `users` 
 console.log(result_delete.affectedRows);
 ```
 
-

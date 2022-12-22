@@ -26,6 +26,10 @@ CREATE TABLE IF NOT EXISTS likes (
   FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
+CREATE PROCEDURE get_likes_for_post(IN post_id INT)
+BEGIN
+  SELECT COUNT(*) AS likes FROM likes WHERE post_id = post_id;
+END;
 
 INSERT INTO users (name, email) VALUES ('John', 'john@example.com');
 INSERT INTO users (name, email) VALUES ('Paul', 'paul@example.com');

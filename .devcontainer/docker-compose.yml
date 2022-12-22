@@ -19,8 +19,7 @@ services:
       MYSQL_USER: test
       MYSQL_PASSWORD: test
   phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: pma
+    image: phpmyadmin
     links:
       - db
     environment:

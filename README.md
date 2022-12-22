@@ -144,3 +144,90 @@ const [result_delete] = await connection.execute<OkPacket>('DELETE FROM `users` 
 console.log(result_delete.affectedRows);
 ```
 
+#### Stored procedures
+
+Als je een stored procedure wilt uitvoeren dan kun je de `execute` functie ook gebruiken. Je moet dan wel de `CALL` query gebruiken. Wil je hiervoor geen interface voor aanmaken kan je ook altijd de `RowDataPacket` gebruiken. Dit werkt ook voor andere queries.
+
+```typescript
+const [rows_likes] = await connection.execute<RowDataPacket[]>('CALL get_likes_for_post(?)', [1]);
+console.log(rows_likes[0].likes);
+```
+
+## Express
+
+We kunnen met de kennis die we nu hebben van de mysql2 en de express library nu een API gaan bouwen. We gaan een API maken die gebruikers kan aanmaken, posts kan aanmaken en likes kan geven aan posts.
+
+```typescript
+import express from 'express';
+import mysql from 'mysql2/promise';
+
+const app = express();
+const port = 3000;
+
+app.use(express.json());
+
+app.get('/users', async (req, res) => {
+  
+  
+});
+
+app.listen(port, async() => {
+  console.log(`Example app listening at http://localhost:${port}`);
+});
+```
+
+## SQL Script
+
+Het SQL init script dat voor de code hierboven hebben gebruikt is als volgt:
+
+```sql
+CREATE DATABASE IF NOT EXISTS tutorial;
+USE tutorial;
+
+CREATE TABLE IF NOT EXISTS users (
+  id INT NOT NULL AUTO_INCREMENT,
+  name VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS posts (
+  id INT NOT NULL AUTO_INCREMENT,
+  title VARCHAR(255) NOT NULL,
+  body TEXT NOT NULL,
+  user_id INT NOT NULL,
+  PRIMARY KEY (id),
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS likes (
+  id INT NOT NULL AUTO_INCREMENT,
+  post_id INT NOT NULL,
+  user_id INT NOT NULL,
+  PRIMARY KEY (id),
+  FOREIGN KEY (post_id) REFERENCES posts(id),
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+DELIMITER $$
+CREATE PROCEDURE get_likes_for_post(IN post_id INT)
+BEGIN
+  SELECT COUNT(*) AS likes FROM likes WHERE post_id = post_id;
+END$$
+DELIMITER ;
+
+INSERT INTO users (name, email) VALUES ('John', 'john@example.com');
+INSERT INTO users (name, email) VALUES ('Paul', 'paul@example.com');
+INSERT INTO users (name, email) VALUES ('Mary', 'mary@example.com');
+
+INSERT INTO posts (title, body, user_id) VALUES ('John\'s Post', 'This is John\'s post', 1);
+INSERT INTO posts (title, body, user_id) VALUES ('Paul\'s Post', 'This is Paul\'s post', 2);
+INSERT INTO posts (title, body, user_id) VALUES ('Mary\'s Post', 'This is Mary\'s post', 3);
+INSERT INTO posts (title, body, user_id) VALUES ('John\'s Second Post', 'This is John\'s second post', 1);
+
+INSERT INTO likes (post_id, user_id) VALUES (1, 2);
+INSERT INTO likes (post_id, user_id) VALUES (2, 1);
+INSERT INTO likes (post_id, user_id) VALUES (3, 2);
+INSERT INTO likes (post_id, user_id) VALUES (4, 3);
+```
+

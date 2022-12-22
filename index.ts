@@ -1,23 +1,5 @@
 import mysql2, { OkPacket, RowDataPacket } from 'mysql2/promise';
-
-interface User extends RowDataPacket {
-    id?: number;
-    name: string;
-    email: string;
-}
-
-interface Post extends RowDataPacket {
-    id?: number;
-    title: string;
-    content: string;
-    user_id: number;
-}
-
-interface Like extends RowDataPacket {
-    id?: number;
-    user_id: number;
-    post_id: number;
-}
+import { User } from './types';
 
 async function main() {
     try {
@@ -54,7 +36,16 @@ async function main() {
         // Delete a user in the users table
         const [result_delete] = await connection.execute<OkPacket>('DELETE FROM `users` WHERE `id` = ?', [result.insertId]);
         console.log(result_delete.affectedRows);
+
+        // Execute a stored procedure get_likes_for_post
+        const [rows_likes] = await connection.execute<RowDataPacket[]>('CALL get_likes_for_post(?)', [1]);
+        console.log(rows_likes[0].likes);
+
         connection.end();
+
+
+
+
     } catch (error) {
         console.log(error);
     }

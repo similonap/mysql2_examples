@@ -2,7 +2,7 @@
     "dockerComposeFile": "docker-compose.yml",
     "service": "devcontainer",
     "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
-    "forwardPorts": [8081],
+    "forwardPorts": [8081, 3306],
     "customizations": {
         // Configure properties specific to VS Code.
         "vscode": {
